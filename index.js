@@ -25,6 +25,7 @@ const mainController = require("./controller");
 
 app.post("/signup", mainController.signupController);
 app.post("/login", mainController.loginController);
+app.post("/addroom", mainController.addRoomController);
 
 
 const ip = "127.0.0.1";
