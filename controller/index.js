@@ -46,5 +46,32 @@ module.exports = {
         })
         res.status(201).send(userInfo)
     }
-    
+} ,
+
+  mypageController: async(res, req)=> {
+      const authorization = req.headers["authorization"];
+  if (!authorization) {
+    res.status(400).send({ data: null, message: "invalid access token" });
+  } else {
+    token = authorization.split(' ')[1];
+    const data = jwt.verify(token, ACCESS, (err, decoded)=> {
+        if(err){
+            return err.message
+        } else {
+            return decoded
+        }
+    });
+    const userInfo = await users.findOne({
+        where: {email: data.email, name: data.name}
+    })
+
+    if(!userInfo){
+        res.status(400).send({data: null, message: 'access denied'})
+    } else {
+        res.status(200).json({data: {userInfo}, message: 'granted'})
+    }
+    }
+  },
+
+  
 }
