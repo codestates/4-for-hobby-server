@@ -46,5 +46,5 @@ module.exports = {
         })
         res.status(201).send(userInfo)
     }
-    
+  }
 }
