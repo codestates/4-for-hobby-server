@@ -11,7 +11,9 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(cors())
 
-const mainController = require('./controller')
+
+const mainController = require("./controller");
+
 // app.options('/', (req, res)=> {
 //     res.status(200).end()
 // })
@@ -20,7 +22,10 @@ const mainController = require('./controller')
 //   res.status(201).send('Hello World');ㄴ
 // });
 
+
 app.post("/signup", mainController.signupController);
+app.post("/login", mainController.loginController);
+
 
 const ip = "127.0.0.1";
 const server = http.createServer(app);
