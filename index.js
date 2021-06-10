@@ -11,16 +11,16 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(cors())
 
-app.options('/', (req, res)=> {
-    res.status(200).end()
-})
+// app.options('/', (req, res)=> {
+//     res.status(200).end()
+// })
 
-const practice = app.get('/', (req, res) => {
-  res.status(201).send('Hello World');
-});
+// app.get('/', (req, res) => {
+//   res.status(201).send('Hello World');ㄴ
+// });
 
 const ip = "127.0.0.1";
-const server = http.createServer(practice);
+const server = http.createServer(app);
 console.log("Listening on http://" + ip + ":" + port);
 server.listen(port);
 
