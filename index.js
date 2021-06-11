@@ -33,6 +33,7 @@ app.get("/exitroom", mainController.exitRoomController);
 app.get("/",mainController.mainPageController);
 app.post("/messages", mainController.messagesPostController);
 app.get("/messages", mainController.messagesGetController);
+app.put("/mypageupdateuser", mainController.updateUserController);
 
 
 
