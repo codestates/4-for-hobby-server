@@ -5,9 +5,10 @@ const jwt = require('jsonwebtoken')
 require('dotenv').config()
 const ACCESS = process.env.ACCESS_SECRET
 
-const messages = {results: []}
+const messages = {results: []};
 
 module.exports = {
+  //로그인을 할때.
   loginController : async (req, res)=> {
     const {email, password } = req.body;
     const userInfo = await user.findOne({
@@ -16,71 +17,75 @@ module.exports = {
 
     if(!userInfo){
         res.status(403).send({data: null, message: 'please check your email / password'});
-    } else {
-        const {email, name, mobile} = userInfo.dataValues
-        const info = {
-          email: email,
-          name: name,
-          // mobile: mobile, updateUserController에서 user 정보 변경을 하게 되면 토큰도 변경되기 때문에 mobile을 토큰 생성에서 제외해줬습니다.
-        }
-
+    }
+    else {
+      const {email, name, mobile} = userInfo.dataValues
+      const info = {
+        email: email,
+        name: name,
+        // mobile: mobile, updateUserController에서 user 정보 변경을 하게 되면 토큰도 변경되기 때문에 mobile을 토큰 생성에서 제외해줬습니다.
+      }
+      const authorization = req.headers["authorization"];
+      //만약 로그아웃을 하고 로그인을 하는 경우라면 token 생성이 되어 있으므로 토큰을 재생성할 필요가 없다.
+      //그래서 아래 코드에서 존재할 경우와 존재하지 않을 경우를 나눠놓았습니다.
+      if (!authorization) {
+        res.status(200)
+      }
+      else {
         const accToken = jwt.sign(info, ACCESS)
         res.status(200).json({data: {accessToken: accToken}, message: 'granted'})
+      }
     }
   },
   
   signupController: async (req, res)=> {
-   
     const{email, password, name, mobile} = req.body;
 
-     if (!email || !password || !name || !mobile) {
+    if (!email || !password || !name || !mobile) {
       return res.status(422).send("please fill in all the blanks");
-
-    } else {
-
+    }
+    else {
     const emailCheck = await user.findOne({
         where: {email: email}
     })
-
-    if(emailCheck){
-        res.status(409).send('email exists')
-    } else {
-        user.create({
-            email: email,
-            password: password,
-            name: name,
-            mobile: mobile
-        })
-        res.status(201).send(userInfo)
+      if(emailCheck){
+          res.status(409).send('email exists')
+      } else {
+          user.create({
+              email: email,
+              password: password,
+              name: name,
+              mobile: mobile
+          })
+          res.status(201).send(userInfo)
+      }
     }
-
-    }
-
-    
-} ,
+  },
 
   mypageController: async(res, req)=> {
-      const authorization = req.headers["authorization"];
-  if (!authorization) {
-    res.status(400).send({ data: null, message: "invalid access token" });
-  } else {
-    token = authorization.split(' ')[1];
-    const data = jwt.verify(token, ACCESS, (err, decoded)=> {
+    const authorization = req.headers["authorization"];
+
+    if (!authorization) {
+      res.status(400).send({ data: null, message: "invalid access token" });
+    } else {
+      token = authorization.split(' ')[1];
+      const data = jwt.verify(token, ACCESS, (err, decoded)=> {
         if(err){
             return err.message
         } else {
             return decoded
         }
-    });
-    const userInfo = await user.findOne({
-        where: {email: data.email, name: data.name}
-    })
+      });
 
-    if(!userInfo){
-        res.status(400).send({data: null, message: 'access denied'})
-    } else {
-        res.status(200).json({data: {userInfo}, message: 'granted'})
-    }
+      const userInfo = await user.findOne({
+        where: {email: data.email, name: data.name}
+      })
+
+      if(!userInfo){
+          res.status(400).send({data: null, message: 'access denied'})
+      } else {
+          res.status(200).json({data: {userInfo}, message: 'granted'})
+      }
     }
   },
 
@@ -117,31 +122,30 @@ module.exports = {
   // 방 안의 사용자들의 데이터를 가져오는 함수/ 방에 입장하는 순간 enterRoom이 실행되고, getRoomUsersController이게 실행 된다. 나갈 때는 exitRoom이 실행되고, getRoomUsersController실행.
   getRoomUsersController: async(req, res)=>{
       const authorization = req.headers["authorization"];
-  if (!authorization) {
-    res.status(400).send({ data: null, message: "invalid access token" });
-  } else {
-      // 제대로 된 토큰을 가지고 있다면
-    token = authorization.split(' ')[1];
-    //token 안에는 유저의 정보가 들어있다
-    const data = jwt.verify(token, ACCESS, (err, decoded)=> {
+    if (!authorization) {
+      res.status(400).send({ data: null, message: "invalid access token" });
+    }
+    else {
+        // 제대로 된 토큰을 가지고 있다면
+      token = authorization.split(' ')[1];
+      //token 안에는 유저의 정보가 들어있다
+      const data = jwt.verify(token, ACCESS, (err, decoded)=> {
         if(err){
             return err.message
         } else {
             return decoded
         }
-    })
-    const check = await roomList.findOne({
-        where: {name: data.name}
-    })
-
-    const participants = await roomList.findAll({
-        where: {roomName: check.roomName}
-    })
-    //participants.roomName === 방의 이름
-    res.status(200).send({data:{participants}})
-
-  }
-},
+      })
+      const check = await roomList.findOne({
+          where: {name: data.name}
+      })
+      const participants = await roomList.findAll({
+          where: {roomName: check.roomName}
+      })
+      //participants.roomName === 방의 이름
+      res.status(200).send({data:{participants}})
+    }
+  },
 
   addRoomController : async (req, res)=> {
     const authorization = req.headers['authorization'];
@@ -150,23 +154,23 @@ module.exports = {
         res.status(400).send({ "data": null, "message": "invalid access token" })
     }
     else {
-        const token = authorization.split(' ')[1];
-        const data = jwt.verify(token, ACCESS)
-        
-        const userInfo = await user.findOne({
-        where: { name: data.name, email: data.email },
-        });
-        
-        if(!userInfo) {
-            res.status(400).send({ "data": null, "message": "access token has been tempered" })
-        }
-        else{
-          roomList.create({
-            name : userInfo.name,
-            roomname : req.body.roomname,
-            hobby : req.body.hobby
-          })
-          res.status(200).send(roominfo);
+      const token = authorization.split(' ')[1];
+      const data = jwt.verify(token, ACCESS)
+      
+      const userInfo = await user.findOne({
+      where: { name: data.name, email: data.email },
+      });
+      
+      if(!userInfo) {
+          res.status(400).send({ "data": null, "message": "access token has been tempered" })
+      }
+      else{
+        roomList.create({
+          name : userInfo.name,
+          roomname : req.body.roomname,
+          hobby : req.body.hobby
+        })
+        res.status(200).send(roominfo);
       }
     }
   },
