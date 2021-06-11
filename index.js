@@ -30,6 +30,7 @@ app.get("/mypage", mainController.mypageController)
 app.post("/enterroom", mainController.enterRoomController);
 app.get("/getroomusers", mainController.getRoomUsersController);
 app.get("/exitroom", mainController.exitRoomController);
+app.get("/",mainController.mainPageController);
 
 
 const ip = "127.0.0.1";

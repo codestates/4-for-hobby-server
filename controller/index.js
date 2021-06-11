@@ -160,7 +160,7 @@ module.exports = {
             res.status(400).send({ "data": null, "message": "access token has been tempered" })
         }
         else{
-          roomlist.create({
+          roomList.create({
             name : userInfo.name,
             roomname : req.body.roomname,
             hobby : req.body.hobby
@@ -192,5 +192,11 @@ module.exports = {
         where: {email: data.email}
       });
     }
-  }, 
+  },
+
+  mainPageController: async(res, req)=>{
+    //mainPageController 기능은 로그인전 로그인후 메인페이지에서 방 목록들을 가져오는 기능을 한다.
+    //로그인 전과 후 둘다 똑같은 기능을 하기위해 토큰 인증은 필요없어서 작성하지 않음. 
+    res.status(200).send({"data": {roomList}, "messages": "ok"})
+  }
 }
