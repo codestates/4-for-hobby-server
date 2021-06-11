@@ -26,6 +26,10 @@ const mainController = require("./controller");
 app.post("/signup", mainController.signupController);
 app.post("/login", mainController.loginController);
 app.post("/addroom", mainController.addRoomController);
+app.get("/mypage", mainController.mypageController)
+app.post("/enterroom", mainController.enterRoomController);
+app.get("/getroomusers", mainController.getRoomUsersController);
+app.get("/exitroom", mainController.exitRoomController);
 
 
 const ip = "127.0.0.1";

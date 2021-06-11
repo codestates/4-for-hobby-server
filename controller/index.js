@@ -82,7 +82,9 @@ module.exports = {
     }
   },
 
-  enterRoom: async (res, req)=> {
+
+  enterRoomController: async (res, req)=> {
+
 // 방 입장 한 사람이 제대로 된 토큰을 가지고 있는지 확인한다.
     const authorization = req.headers["authorization"];
   if (!authorization) {
@@ -168,5 +170,29 @@ module.exports = {
       }
     }
   },
+
+
+  exitRoomController: async(res, req)=>{
+    // 방 입장 한 사람이 제대로 된 토큰을 가지고 있는지 확인한다.
+    const authorization = req.headers["authorization"];
+  if (!authorization) {
+    res.status(400).send({ data: null, message: "invalid access token" });
+  } else {
+      // 제대로 된 토큰을 가지고 있다면
+    token = authorization.split(' ')[1];
+    //token 안에는 유저의 정보가 들어있다
+    const data = jwt.verify(token, ACCESS, (err, decoded)=> {
+        if(err){
+            return err.message
+        } else {
+            return decoded
+        }
+    });
+    // 나간 유저는 더이상 채팅방에 보여질 필요가 없기 때문에, 해당 정보를 room에서 제외시켜준다
+    await roomList.destroy({
+  where: {email: data.email}
+});
+}
+  }, 
 
 }
