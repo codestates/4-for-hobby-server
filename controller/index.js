@@ -2,6 +2,7 @@ const {user} = require("../models")
 const {roomList} = require("../models")
 
 const jwt = require('jsonwebtoken')
+const { ExclusionConstraintError } = require('sequelize')
 require('dotenv').config()
 const ACCESS = process.env.ACCESS_SECRET
 
@@ -81,7 +82,9 @@ module.exports = {
     }
   },
 
+
   enterRoomController: async (res, req)=> {
+
 // 방 입장 한 사람이 제대로 된 토큰을 가지고 있는지 확인한다.
     const authorization = req.headers["authorization"];
   if (!authorization) {
@@ -167,6 +170,7 @@ module.exports = {
       }
     }
   },
+
 
   exitRoomController: async(res, req)=>{
     // 방 입장 한 사람이 제대로 된 토큰을 가지고 있는지 확인한다.

@@ -32,8 +32,6 @@ app.get("/getroomusers", mainController.getRoomUsersController);
 app.get("/exitroom", mainController.exitRoomController);
 
 
-
-
 const ip = "127.0.0.1";
 const server = http.createServer(app);
 console.log("Listening on http://" + ip + ":" + port);
