@@ -1,4 +1,4 @@
-const {users} = require("../models")
+const {user} = require("../models")
 const jwt = require('jsonwebtoken')
 const { ExclusionConstraintError } = require('sequelize')
 require('dotenv').config()
@@ -7,7 +7,7 @@ const ACCESS = process.env.ACCESS_SECRET
 module.exports = {
   loginController : async (req, res)=> {
     const {email, password } = req.body;
-    const userInfo = await users.findOne({
+    const userInfo = await user.findOne({
         where: {email: email, password: password}
     });
 
@@ -32,7 +32,7 @@ module.exports = {
       return res.status(422).send("please fill in all the blanks");
     }
 
-    const emailCheck = await users.findOne({
+    const emailCheck = await user.findOne({
         where: {email: email}
     })
 
@@ -59,7 +59,7 @@ module.exports = {
         const token = authorization.split(' ')[1];
         const data = jwt.verify(token, ACCESS)
         
-        const userInfo = await Users.findOne({
+        const userInfo = await user.findOne({
         where: { name: data.name, email: data.email },
         });
         
