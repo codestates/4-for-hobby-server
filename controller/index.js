@@ -209,5 +209,6 @@ module.exports = {
   messagesGetController: async(res, req)=>{
     // 대화 내용들을 messages.results로 전달 합니다 
     res.status(200).send(JSON.stringify(messages));
-  }
+  },
+  
 }
