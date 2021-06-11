@@ -29,7 +29,7 @@ app.post("/addroom", mainController.addRoomController);
 app.get("/mypage", mainController.mypageController)
 app.post("/enterroom", mainController.enterRoomController);
 app.get("/getroomusers", mainController.getRoomUsersController);
-app.get("/exitroom", mainController.exitRoomController);
+app.post("/exitroom", mainController.exitRoomController);
 app.get("/",mainController.mainPageController);
 app.post("/messages", mainController.messagesPostController);
 app.get("/messages", mainController.messagesGetController);

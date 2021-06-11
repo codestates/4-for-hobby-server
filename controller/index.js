@@ -62,7 +62,7 @@ module.exports = {
     }
   },
 
-  mypageController: async(res, req)=> {
+  mypageController: async(req, res)=> {
     const authorization = req.headers["authorization"];
 
     if (!authorization) {
@@ -89,7 +89,7 @@ module.exports = {
     }
   },
 
-  enterRoomController: async (res, req)=> {
+  enterRoomController: async (req, res)=> {
 // 방 입장 한 사람이 제대로 된 토큰을 가지고 있는지 확인한다.
     const authorization = req.headers["authorization"];
   if (!authorization) {
@@ -175,7 +175,7 @@ module.exports = {
     }
   },
 
-  exitRoomController: async(res, req)=>{
+  exitRoomController: async(req, res)=>{
     // 방 입장 한 사람이 제대로 된 토큰을 가지고 있는지 확인한다.
     const authorization = req.headers["authorization"];
   if (!authorization) {
@@ -198,24 +198,25 @@ module.exports = {
     }
   },
 
-  mainPageController: async(res, req)=>{
+  mainPageController: async(req, res)=>{
     //mainPageController 기능은 로그인전 로그인후 메인페이지에서 방 목록들을 가져오는 기능을 한다.
     //로그인 전과 후 둘다 똑같은 기능을 하기위해 토큰 인증은 필요없어서 작성하지 않음. 
-    res.status(200).send({"data": {roomList}, "messages": "ok"})
+    const roomInfo = await roomList.findAll()
+    res.status(200).send({ "data": { roomInfo }, "messages": "ok" })
   },
 
-  messagesPostController: async(res, req)=>{
+  messagesPostController: async(req, res)=>{
     // 8번째 줄에 선언 한 messages.results변수에 내용을 저장합니다.
     messages.results.push(req.body);
     res.status(201).send(JSON.stringify(req.body));
   },
 
-  messagesGetController: async(res, req)=>{
+  messagesGetController: async(req, res)=>{
     // 대화 내용들을 messages.results로 전달 합니다 
     res.status(200).send(JSON.stringify(messages));
   },
   
-  updateUserController: async(res, req)=>{
+  updateUserController: async(req, res)=>{
     //유저 마이페이지 수정입니다. email과 name은 수정이 불가능하고 패스워드(password), 휴대폰 번호(mobile)만 수정이 가능하게 했습니다.
     //where통해 수정하고자하는 유저를 email을 통해 불러온 뒤, update로 수정을 진행합니다.
     //주의!! mypage 수정에 들어갔을 때 클라이언트 inputbox에 수정할 password와 mobile의 userInfo 정보가 미리 써져있어야합니다!!
