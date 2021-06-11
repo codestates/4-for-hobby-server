@@ -21,7 +21,7 @@ module.exports = {
         const info = {
           email: email,
           name: name,
-          mobile: mobile,
+          // mobile: mobile, updateUserController에서 user 정보 변경을 하게 되면 토큰도 변경되기 때문에 mobile을 토큰 생성에서 제외해줬습니다.
         }
 
         const accToken = jwt.sign(info, ACCESS)
@@ -211,4 +211,21 @@ module.exports = {
     res.status(200).send(JSON.stringify(messages));
   },
   
+  updateUserController: async(res, req)=>{
+    //유저 마이페이지 수정입니다. email과 name은 수정이 불가능하고 패스워드(password), 휴대폰 번호(mobile)만 수정이 가능하게 했습니다.
+    //where통해 수정하고자하는 유저를 email을 통해 불러온 뒤, update로 수정을 진행합니다.
+    //주의!! mypage 수정에 들어갔을 때 클라이언트 inputbox에 수정할 password와 mobile의 userInfo 정보가 미리 써져있어야합니다!!
+    const{email, password, name, mobile} = req.body;
+
+    const userInfo = await user.findOne({
+      where: {email: email}
+    });
+
+    await user.update({
+      password : password,
+      mobile : mobile,
+    }, {
+      where : {email: userInfo.email}
+    })
+  },
 }
