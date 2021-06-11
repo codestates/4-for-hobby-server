@@ -15,10 +15,11 @@ module.exports = {
     if(!userInfo){
         res.status(403).send({data: null, message: 'please check your email / password'});
     } else {
+        const {email, name, mobile} = userInfo.dataValues
         const info = {
-            email: userInfo.email,
-            name: userInfo.name,
-            mobile: userInfo.mobile,
+          email: email,
+          name: name,
+          mobile: mobile,
         }
 
         const accToken = jwt.sign(info, ACCESS)
