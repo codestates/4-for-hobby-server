@@ -29,11 +29,11 @@ module.exports = {
       //만약 로그아웃을 하고 로그인을 하는 경우라면 token 생성이 되어 있으므로 토큰을 재생성할 필요가 없다.
       //그래서 아래 코드에서 존재할 경우와 존재하지 않을 경우를 나눠놓았습니다.
       if (!authorization) {
-        res.status(200)
+        const accToken = jwt.sign(info, ACCESS)
+        res.status(200).json({data: {accessToken: accToken}, message: 'granted'});
       }
       else {
-        const accToken = jwt.sign(info, ACCESS)
-        res.status(200).json({data: {accessToken: accToken}, message: 'granted'})
+        res.status(200);
       }
     }
   },
