@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken')
 require('dotenv').config()
 const ACCESS = process.env.ACCESS_SECRET
 
+const messages = {results: []}
+
 module.exports = {
   loginController : async (req, res)=> {
     const {email, password } = req.body;
@@ -159,7 +161,7 @@ module.exports = {
             res.status(400).send({ "data": null, "message": "access token has been tempered" })
         }
         else{
-          roomlist.create({
+          roomList.create({
             name : userInfo.name,
             roomname : req.body.roomname,
             hobby : req.body.hobby
@@ -184,12 +186,28 @@ module.exports = {
         } else {
             return decoded
         }
-    });
-    // 나간 유저는 더이상 채팅방에 보여질 필요가 없기 때문에, 해당 정보를 room에서 제외시켜준다
-    await roomList.destroy({
-  where: {email: data.email}
-});
-}
-  }, 
+      });
+      // 나간 유저는 더이상 채팅방에 보여질 필요가 없기 때문에, 해당 정보를 room에서 제외시켜준다
+      await roomList.destroy({
+        where: {email: data.email}
+      });
+    }
+  },
 
+  mainPageController: async(res, req)=>{
+    //mainPageController 기능은 로그인전 로그인후 메인페이지에서 방 목록들을 가져오는 기능을 한다.
+    //로그인 전과 후 둘다 똑같은 기능을 하기위해 토큰 인증은 필요없어서 작성하지 않음. 
+    res.status(200).send({"data": {roomList}, "messages": "ok"})
+  },
+
+  messagesPostController: async(res, req)=>{
+    // 8번째 줄에 선언 한 messages.results변수에 내용을 저장합니다.
+    messages.results.push(req.body);
+    res.status(201).send(JSON.stringify(req.body));
+  },
+
+  messagesGetController: async(res, req)=>{
+    // 대화 내용들을 messages.results로 전달 합니다 
+    res.status(200).send(JSON.stringify(messages));
+  }
 }
