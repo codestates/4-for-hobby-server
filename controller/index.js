@@ -205,7 +205,6 @@ module.exports = {
   messagesPostController: async(req, res)=>{
     // 8번째 줄에 선언 한 messages.results변수에 내용을 저장합니다.
     messages.results.push(req.body);
-    res.status(201).send(JSON.stringify(req.body));
   },
 
   messagesGetController: async(req, res)=>{
