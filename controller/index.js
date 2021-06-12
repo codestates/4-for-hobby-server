@@ -110,12 +110,12 @@ module.exports = {
         where: {email: data.email, name: data.name}
     })
     // db에 존재한다고 하면, room 테이블에 해당 유저의 정보를 입력한다 (사람이 방에 들어왔으니 +1)
-    // client에서 버튼을 누르는 순간, 방 이름을 req.body로 전달하여 roomName을 설정 가능한가? 이것이 가능하다면, 테이블은 하나만 만들어도 된다.
-    const{hobby, roomName} = req.body
-     roomList.create({
-        name: userInfo.name,
-        hobby: hobby,
-        roomName: roomName,
+    // 클라이언트에서 들어가기 버튼을 누르면 req로 roomid를 받아오고 user에서 userid를 받아서 새로 만든 join table에 저장한다!!
+    //(필독 !!!!!!join table을 만든 이유는 채팅방 들어갔을때 유저정보를 오른쪽 사이드에 표시하기 위해 만듬)
+    const{roomid} = req.body
+    join.create({
+      roomid: roomid,
+      userid: userInfo.id,
     })
    }
   },
@@ -136,14 +136,11 @@ module.exports = {
             return decoded
         }
       })
-      const check = await roomList.findOne({
-          where: {name: data.name}
+      //(join table에 모든 이용자가 같은 roomid 와 다른 userid로 저장되어 있어서 userIdList로 클라이언트로 정보를 보내줌)
+      const userIdList = await join.findAll({
+          where: {roomid: data.roomid}
       })
-      const participants = await roomList.findAll({
-          where: {roomName: check.roomName}
-      })
-      //participants.roomName === 방의 이름
-      res.status(200).send({data:{participants}})
+      res.status(200).send({ "data": { userIdList }, "messages": "ok" })
     }
   },
 
