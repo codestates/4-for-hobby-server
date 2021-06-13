@@ -165,7 +165,7 @@ module.exports = {
       else{
         roomList.create({
           name : userInfo.name,
-          roomName : req.body.roomname,
+          roomName : req.body.roomName,
           hobby : req.body.hobby
         })
         res.status(200);
