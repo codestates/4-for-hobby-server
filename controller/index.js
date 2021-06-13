@@ -1,5 +1,6 @@
 const {user} = require("../models")
 const {roomList} = require("../models")
+const {join} = require("../models")
 
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
@@ -165,7 +166,7 @@ module.exports = {
       else{
         roomList.create({
           name : userInfo.name,
-          roomName : req.body.roomname,
+          roomName : req.body.roomName,
           hobby : req.body.hobby
         })
         res.status(200);
@@ -233,7 +234,7 @@ module.exports = {
 
   deleteRoomController: async(req, res)=>{
     await roomList.destroy({
-      where: {roomName: req.body.roomName}
+      where: {roomName: req.parms.id}
     })
   },
 }
