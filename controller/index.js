@@ -112,10 +112,10 @@ module.exports = {
     // db에 존재한다고 하면, room 테이블에 해당 유저의 정보를 입력한다 (사람이 방에 들어왔으니 +1)
     // 클라이언트에서 들어가기 버튼을 누르면 req로 roomid를 받아오고 user에서 userid를 받아서 새로 만든 join table에 저장한다!!
     //(필독 !!!!!!join table을 만든 이유는 채팅방 들어갔을때 유저정보를 오른쪽 사이드에 표시하기 위해 만듬)
-    const{roomid} = req.body
+    const{roomId} = req.body
     join.create({
-      roomid: roomid,
-      userid: userInfo.id,
+      roomId: roomId,
+      userId: userInfo.id,
     })
    }
   },
@@ -151,7 +151,7 @@ module.exports = {
         })
       */
       const userIdList = await join.findAll({
-          where: {roomid: data.roomid}
+          where: {roomId: req.body.roomId}
       })
       res.status(200).send({ "data": { userIdList }, "messages": "ok" })
     }
@@ -177,10 +177,10 @@ module.exports = {
       else{
         roomList.create({
           name : userInfo.name,
-          roomname : req.body.roomname,
+          roomName : req.body.roomname,
           hobby : req.body.hobby
         })
-        res.status(200).send(roominfo);
+        res.status(200);
       }
     }
   },
