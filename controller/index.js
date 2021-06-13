@@ -137,6 +137,19 @@ module.exports = {
         }
       })
       //(join table에 모든 이용자가 같은 roomid 와 다른 userid로 저장되어 있어서 userIdList로 클라이언트로 정보를 보내줌)
+      // 내가 만약에 5번 방에 들어갔으면, 5번 방에 들어간 사람들의 id를 전부 받아오고 싶음
+      /* const test1 = user.findOne({
+        where: {name: data.name}
+      })
+
+        const test2 = join.findOne({
+          where : {userId: test1.Id}
+        })
+
+        const test3 = join.findAll({
+          where: {roomid: test2.roomid}
+        })
+      */
       const userIdList = await join.findAll({
           where: {roomid: data.roomid}
       })
