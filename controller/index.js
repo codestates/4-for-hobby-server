@@ -1,5 +1,6 @@
 const {user} = require("../models")
 const {roomList} = require("../models")
+const {join} = require("../models")
 
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
