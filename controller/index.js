@@ -233,7 +233,7 @@ module.exports = {
 
   deleteRoomController: async(req, res)=>{
     await roomList.destroy({
-      where: {roomName: req.parms.id}
+      where: {roomName: req.params.id}
     })
   },
 }
