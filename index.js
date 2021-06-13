@@ -37,7 +37,7 @@ app.get("/",mainController.mainPageController);
 app.post("/messages", mainController.messagesPostController);
 app.get("/messages", mainController.messagesGetController);
 app.put("/mypageupdateuser", mainController.updateUserController);
-app.post("/deleteroom", mainController.deleteRoomController);
+app.post("/deleteroom/:id", mainController.deleteRoomController);
 
 //socket.io
 socket.on('send', function (data) {
