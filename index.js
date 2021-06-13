@@ -5,6 +5,9 @@ const fs = require("fs");
 const http = require("http");
 const app = express()
 
+//socket.io
+const io =require('socket.io')(server);
+
 const port = 80;
 
 app.use(bodyParser.json());
@@ -31,6 +34,62 @@ app.post("/messages", mainController.messagesPostController);
 app.get("/messages", mainController.messagesGetController);
 app.put("/mypageupdateuser", mainController.updateUserController);
 app.post("/deleteroom", mainController.deleteRoomController);
+
+//socket.io
+app.get('/', function(req, res) {
+  res.sendFile(__dirname + '/index.html');
+});
+
+// connection event handler
+// connection이 수립되면 event handler function의 인자로 socket인 들어온다
+io.on('connection', function(socket) {
+
+  // 접속한 클라이언트의 정보가 수신되면
+  socket.on('get', function(data) {
+    // console.log('Client logged-in:\n name:' + data.name + '\n userid: ' + data.userid);
+
+    // socket에 클라이언트 정보를 저장한다
+    socket.name = data.name;
+    socket.message = data.message;
+
+    // 접속된 모든 클라이언트에게 메시지를 전송한다
+    io.emit('get', data.name );
+  });
+
+  // 클라이언트로부터의 메시지가 수신되면
+  socket.on('send', function(data) {
+    console.log('Message from %s: %s', data.name, data.message);
+
+    var msg = {
+      from: {
+        name: data.name,
+        message: data.message
+      }
+    };
+
+    // 메시지를 전송한 클라이언트를 제외한 모든 클라이언트에게 메시지를 전송한다
+    socket.broadcast.emit('send', msg);
+
+    // 메시지를 전송한 클라이언트에게만 메시지를 전송한다
+    // socket.emit('s2c chat', msg);
+
+    // 접속된 모든 클라이언트에게 메시지를 전송한다
+    // io.emit('s2c chat', msg);
+
+    // 특정 클라이언트에게만 메시지를 전송한다
+    // io.to(id).emit('s2c chat', data);
+  });
+
+  // force client disconnect from server
+  socket.on('forceDisconnect', function() {
+    socket.disconnect();
+  })
+
+  socket.on('disconnect', function() {
+    console.log('user disconnected: ' + socket.name);
+  });
+});
+
 
 
 
