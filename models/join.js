@@ -14,8 +14,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   join.init({
-    roomid: DataTypes.INTEGER,
-    userid: DataTypes.INTEGER
+    roomId: DataTypes.INTEGER,
+    userId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'join',

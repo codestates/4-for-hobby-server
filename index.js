@@ -5,23 +5,19 @@ const fs = require("fs");
 const http = require("http");
 const app = express()
 
-const port = 3000
+const port = 80;
 
 app.use(bodyParser.json());
 app.use(express.json());
-app.use(cors())
+app.use(cors({
+  origin: "http://localhost:80",
+  methods: ["GET", "POST", "PUT"],
+  credentials : true
+}
+))
 
 
 const mainController = require("./controller");
-
-// app.options('/', (req, res)=> {
-//     res.status(200).end()
-// })
-
-// app.get('/', (req, res) => {
-//   res.status(201).send('Hello World');ㄴ
-// });
-
 
 app.post("/signup", mainController.signupController);
 app.post("/login", mainController.loginController);
