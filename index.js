@@ -10,7 +10,7 @@ const port = 80;
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(cors({
-  origin: "http://localhost:80",
+  origin: true,
   methods: ["GET", "POST", "PUT"],
   credentials : true
 }
@@ -30,6 +30,7 @@ app.get("/",mainController.mainPageController);
 app.post("/messages", mainController.messagesPostController);
 app.get("/messages", mainController.messagesGetController);
 app.put("/mypageupdateuser", mainController.updateUserController);
+app.post("/deleteroom", mainController.deleteRoomController);
 
 
 

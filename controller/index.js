@@ -229,4 +229,10 @@ module.exports = {
       where : {email: userInfo.email}
     })
   },
+
+  deleteRoomController: async(req, res)=>{
+    await roomList.destroy({
+      where: {roomName: req.body.roomName}
+    })
+  },
 }
