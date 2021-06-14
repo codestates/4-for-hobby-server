@@ -157,11 +157,16 @@ module.exports = {
       const userInfo = await user.findOne({
       where: { name: data.name, email: data.email },
       });
-      
-      if(!userInfo) {
+      //  방 이름을 req로 보내주면, db에서 확인을 해준다 (중복인지 아닌지)
+      const sameRoom = await roomList.findOne({
+        where: {roomName: req.body.roomName}
+      });
+
+
+      if(!userInfo || sameRoom) {
           res.status(400).send({ "data": null, "message": "access token has been tempered" })
       }
-      else{
+      else {
         roomList.create({
           name : userInfo.name,
           roomName : req.body.roomName,
