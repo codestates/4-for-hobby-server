@@ -140,7 +140,14 @@ module.exports = {
       const userIdList = await join.findAll({
           where: {roomId: req.body.roomId}
       })
-      res.status(200).send({ "data": { userIdList }, "messages": "ok" })
+      const userNames = [];
+      for (let i = 0; i < userIdList.length; i++) {
+        const member = await user.findOne({
+          where: { id: userIdList[i].userId }
+        })
+        userNames.push({ name: member.name });
+      }
+      res.status(200).send({ "data": { userNames }, "messages": "ok" })
     }
   },
 
@@ -238,4 +245,5 @@ module.exports = {
       where: {roomName: req.params.id}
     })
   },
+
 }
