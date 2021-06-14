@@ -6,8 +6,6 @@ const jwt = require('jsonwebtoken')
 require('dotenv').config()
 const ACCESS = process.env.ACCESS_SECRET
 
-const messages = {results: []};
-
 module.exports = {
   //로그인을 할때.
   loginController : async (req, res)=> {
@@ -138,6 +136,7 @@ module.exports = {
         }
       })
       //(join table에 모든 이용자가 같은 roomid 와 다른 userid로 저장되어 있어서 userIdList로 클라이언트로 정보를 보내줌)
+      // 내가 만약에 5번 방에 들어갔으면, 5번 방에 들어간 사람들의 id를 전부 받아오고 싶음
       const userIdList = await join.findAll({
           where: {roomId: req.body.roomId}
       })
@@ -189,10 +188,18 @@ module.exports = {
             return decoded
         }
       });
-      // 나간 유저는 더이상 채팅방에 보여질 필요가 없기 때문에, 해당 정보를 room에서 제외시켜준다
+     
+      const userInfo = await user.findOne({
+        where: {email: data.email, name: data.name}
+      })  
+ // 나간 유저는 더이상 채팅방에 보여질 필요가 없기 때문에, 해당 정보를 room에서 제외시켜준다
       await roomList.destroy({
-        where: {email: data.email}
+        where: {email: userInfo.email}
       });
+// join테이블의 해당 이름과 이메일을 가지고 있는 유저를 제외 시켜준다
+      await join.destroy({
+        where: {userId: userInfo.id}
+      })
     }
   },
 
@@ -201,16 +208,6 @@ module.exports = {
     //로그인 전과 후 둘다 똑같은 기능을 하기위해 토큰 인증은 필요없어서 작성하지 않음. 
     const roomInfo = await roomList.findAll()
     res.status(200).send({ "data": { roomInfo }, "messages": "ok" })
-  },
-
-  messagesPostController: async(req, res)=>{
-    // 8번째 줄에 선언 한 messages.results변수에 내용을 저장합니다.
-    messages.results.push(req.body);
-  },
-
-  messagesGetController: async(req, res)=>{
-    // 대화 내용들을 messages.results로 전달 합니다 
-    res.status(200).send(JSON.stringify(messages));
   },
   
   updateUserController: async(req, res)=>{
