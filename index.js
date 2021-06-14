@@ -1,11 +1,9 @@
 const express = require("express")
 const cors = require("cors")
 const bodyParser = require("body-parser");
-const fs = require("fs");
 const http = require("http");
 const app = express()
 
-//socket.io
 const port = 80;
 const ip = "127.0.0.1";
 const server = http.createServer(app);
@@ -38,6 +36,8 @@ app.post("/messages", mainController.messagesPostController);
 app.get("/messages", mainController.messagesGetController);
 app.put("/mypageupdateuser", mainController.updateUserController);
 app.post("/deleteroom/:id", mainController.deleteRoomController);
+//multer
+app.use('/api/product', require('./controller/image'));
 
 //socket.io
 socket.on('send', function (data) {
