@@ -36,7 +36,7 @@ app.get("/", mainController.mainPageController);
 // app.post("/messages", mainController.messagesPostController);
 // app.get("/messages", mainController.messagesGetController);
 app.put("/mypageupdateuser", mainController.updateUserController);
-app.post("/deleteroom:id", mainController.deleteRoomController);
+app.delete("/deleteroom:id", mainController.deleteRoomController);
 app.use("/api/product", require("./controller/image"));
 
 //socket.io

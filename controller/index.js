@@ -92,7 +92,6 @@ module.exports = {
   enterRoomController: async (req, res) => {
     // 방 입장 한 사람이 제대로 된 토큰을 가지고 있는지 확인한다.
     const authorization = req.headers["authorization"];
-
     if (!authorization) {
       res.status(400).send({ data: null, message: "invalid access token" });
     } else {
@@ -215,8 +214,8 @@ module.exports = {
   mainPageController: async (req, res) => {
     //mainPageController 기능은 로그인전 로그인후 메인페이지에서 방 목록들을 가져오는 기능을 한다.
     //로그인 전과 후 둘다 똑같은 기능을 하기위해 토큰 인증은 필요없어서 작성하지 않음.
-    const roomInfo = await roomList.findAll();
-    res.status(200).send({ data: { roomInfo }, messages: "ok" });
+    const roomData = await roomList.findAll();
+    res.status(200).send({ data: { roomData }, messages: "ok" });
   },
 
   updateUserController: async (req, res) => {
