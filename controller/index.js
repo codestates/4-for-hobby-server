@@ -203,7 +203,6 @@ module.exports = {
       const userInfo = await user.findOne({
         where: { email: data.email, name: data.name },
       });
-      console.log(userInfo);
       // 나간 유저는 더이상 채팅방에 보여질 필요가 없기 때문에, 해당 정보를 room에서 제외시켜준다
       // join테이블의 해당 이름과 이메일을 가지고 있는 유저를 제외 시켜준다
       await join.destroy({
