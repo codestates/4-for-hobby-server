@@ -38,6 +38,8 @@ app.get("/", mainController.mainPageController);
 app.put("/mypageupdateuser", mainController.updateUserController);
 app.delete("/deleteroom:id", mainController.deleteRoomController);
 app.use("/api/product", require("./controller/image"));
+app.put("/", mainController.likeController);
+app.get("/", mainController.postLikeNumController);
 
 //socket.io
 
@@ -59,7 +61,6 @@ io.on("connection", function (socket) {
   // 클라이언트로부터의 메시지가 수신되면
   socket.on("send", function (data) {
     //console.log('Message from %s: %s', data.name, data.message);
-
     var msg = {
       from: {
         name: data.name,
@@ -67,9 +68,8 @@ io.on("connection", function (socket) {
         userId: data.id,
       },
     };
-
     // 메시지를 전송한 클라이언트를 제외한 모든 클라이언트에게 메시지를 전송한다
-    socket.broadcast.emit("sendAll", msg);
+    // socket.broadcast.emit("sendAll", msg);
 
     // 메시지를 전송한 클라이언트에게만 메시지를 전송한다
     // socket.emit('s2c chat', msg);
