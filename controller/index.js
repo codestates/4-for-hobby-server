@@ -244,4 +244,67 @@ module.exports = {
       where: { roomName: req.params.id },
     });
   },
+
+  likeController: async (req, res) => {
+    const authorization = req.headers["authorization"];
+    if (!authorization) {
+      res.status(400).send({ data: null, message: "invalid access token" });
+    }
+    const { roomId, userId } = req.body;
+    const check = await likeList.findOne({
+      where: { roomId: roomId },
+    });
+    if (!check) {
+      await likeList.create({
+        roomId: roomId,
+        likeNum: 1,
+      });
+      await likeList.create({
+        roomId: roomId,
+        userId: userId,
+        likeStatus: true,
+      });
+
+      const likeTable = await likeList.findOne({
+        where: { roomId: roomId },
+      });
+      res.status(200).send({ data: likeTable.likeNum });
+    } else {
+      // 방이 있을 때. 2가지 (1) 다른 유저가 누를 때like +1 // (2) 같은 유저가 누를 떄like -1
+      const checkUser = await likeList.findOne({
+        where: { roomId: roomId, userId: userId },
+      });
+      if (!checkUser) {
+        await likeList.create({
+          roomId: roomId,
+          userId: userId,
+          likeStatus: true,
+        });
+        await likeList.increment({
+          likeNum,
+          where: { roomId: roomId },
+        });
+      } else {
+        await likeList.update({
+          likeStatus: false,
+          where: { roomId: roomId },
+        });
+        await likeList.decrement({
+          likeNum,
+          where: { roomId: roomId },
+        });
+      }
+      const likeTable = await likeList.findOne({
+        where: { roomId: roomId },
+      });
+      res.status(200).send({ data: likeTable.likeNum });
+    }
+  },
+
+  postLikeNumController: async (req, res) => {
+    const likeTable = await likeList.findAll({
+      where: { likeNum: !null },
+    });
+    res.status(200).send({ data: likeTable });
+  },
 };
