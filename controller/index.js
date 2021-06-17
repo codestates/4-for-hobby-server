@@ -1,7 +1,7 @@
 const { user } = require("../models");
 const { roomList } = require("../models");
 const { join } = require("../models");
-
+const { likeList } = require("../models");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const ACCESS = process.env.ACCESS_SECRET;
@@ -38,7 +38,7 @@ module.exports = {
       }
     }
   },
-
+  //회원가입 할 떄
   signupController: async (req, res) => {
     const { email, password, name, mobile } = req.body;
 
@@ -48,6 +48,7 @@ module.exports = {
       const emailCheck = await user.findOne({
         where: { email: email },
       });
+      //이미 사용중인 이메일인지 확인합니다
       if (emailCheck) {
         res.status(409).send("email exists");
       } else {
@@ -61,7 +62,7 @@ module.exports = {
       }
     }
   },
-
+  //마이페이지 데이터 받아오기
   mypageController: async (req, res) => {
     const authorization = req.headers["authorization"];
 
@@ -88,7 +89,7 @@ module.exports = {
       }
     }
   },
-
+  //방 입장 할 때
   enterRoomController: async (req, res) => {
     // 방 입장 한 사람이 제대로 된 토큰을 가지고 있는지 확인한다.
     const authorization = req.headers["authorization"];
@@ -150,7 +151,7 @@ module.exports = {
       res.status(200).send({ data: { userNames }, messages: "ok" });
     }
   },
-
+  //방 생성 할 떄 db에 레코드 추가(들어온 유저의 정보)
   addRoomController: async (req, res) => {
     const authorization = req.headers["authorization"];
 
@@ -163,7 +164,7 @@ module.exports = {
       const userInfo = await user.findOne({
         where: { name: data.name, email: data.email },
       });
-      //  방 이름을 req로 보내주면, db에서 확인을 해준다 (중복인지 아닌지)
+      //클라이언트에서 방 이름을 req로 보내주면, db에서 확인을 해준다 (중복인지 아닌지 + 유저인지 아닌지). 아니라면 방을 하나 생성한다
       const sameRoom = await roomList.findOne({
         where: { roomName: req.body.roomName },
       });
@@ -182,7 +183,7 @@ module.exports = {
       }
     }
   },
-
+  // 방 나갈 떄 db에서 해당 레코드 삭제(나간 사람의 레코드)
   exitRoomController: async (req, res) => {
     // 방 입장 한 사람이 제대로 된 토큰을 가지고 있는지 확인한다.
     const authorization = req.headers["authorization"];
@@ -210,16 +211,14 @@ module.exports = {
       });
     }
   },
-
+  //mainPageController 기능은 로그인전 로그인후 메인페이지에서 방 목록들을 가져오는 기능을 한다.
   mainPageController: async (req, res) => {
-    //mainPageController 기능은 로그인전 로그인후 메인페이지에서 방 목록들을 가져오는 기능을 한다.
     //로그인 전과 후 둘다 똑같은 기능을 하기위해 토큰 인증은 필요없어서 작성하지 않음.
     const roomData = await roomList.findAll();
     res.status(200).send({ data: { roomData }, messages: "ok" });
   },
-
+  //유저 마이페이지 수정입니다. email과 name은 수정이 불가능하고 패스워드(password), 휴대폰 번호(mobile)만 수정이 가능하게 했습니다.
   updateUserController: async (req, res) => {
-    //유저 마이페이지 수정입니다. email과 name은 수정이 불가능하고 패스워드(password), 휴대폰 번호(mobile)만 수정이 가능하게 했습니다.
     //where통해 수정하고자하는 유저를 email을 통해 불러온 뒤, update로 수정을 진행합니다.
     //주의!! mypage 수정에 들어갔을 때 클라이언트 inputbox에 수정할 password와 mobile의 userInfo 정보가 미리 써져있어야합니다!!
     const { email, password, name, mobile } = req.body;
@@ -238,73 +237,76 @@ module.exports = {
       }
     );
   },
-
+  //방 삭제 기능
   deleteRoomController: async (req, res) => {
     await roomList.destroy({
       where: { roomName: req.params.id },
     });
   },
-
-  likeController: async (req, res) => {
-    const authorization = req.headers["authorization"];
-    if (!authorization) {
-      res.status(400).send({ data: null, message: "invalid access token" });
-    }
-    const { roomId, userId } = req.body;
-    const check = await likeList.findOne({
-      where: { roomId: roomId },
-    });
-    if (!check) {
-      await likeList.create({
-        roomId: roomId,
-        likeNum: 1,
-      });
-      await likeList.create({
-        roomId: roomId,
-        userId: userId,
-        likeStatus: true,
-      });
-
-      const likeTable = await likeList.findOne({
-        where: { roomId: roomId },
-      });
-      res.status(200).send({ data: likeTable.likeNum });
-    } else {
-      // 방이 있을 때. 2가지 (1) 다른 유저가 누를 때like +1 // (2) 같은 유저가 누를 떄like -1
-      const checkUser = await likeList.findOne({
-        where: { roomId: roomId, userId: userId },
-      });
-      if (!checkUser) {
-        await likeList.create({
-          roomId: roomId,
-          userId: userId,
-          likeStatus: true,
-        });
-        await likeList.increment({
-          likeNum,
-          where: { roomId: roomId },
-        });
-      } else {
-        await likeList.update({
-          likeStatus: false,
-          where: { roomId: roomId },
-        });
-        await likeList.decrement({
-          likeNum,
-          where: { roomId: roomId },
-        });
-      }
-      const likeTable = await likeList.findOne({
-        where: { roomId: roomId },
-      });
-      res.status(200).send({ data: likeTable.likeNum });
-    }
-  },
-
+  //각 방들의 좋아요 개수를 받아올 때
   postLikeNumController: async (req, res) => {
     const likeTable = await likeList.findAll({
-      where: { likeNum: !null },
+      where: { likeNum: null },
     });
     res.status(200).send({ data: likeTable });
   },
 };
+
+//좋아요 기능
+// likeController: async (req, res) => {
+//   const authorization = req.headers["authorization"];
+//   if (!authorization) {
+//     res.status(400).send({ data: null, message: "invalid access token" });
+//   }
+//   const { roomId, userId } = req.body;
+//   const check = await likeList.findOne({
+//     where: { roomId: roomId },
+//   });
+//   if (!check) {
+//     await likeList.create({
+//       roomId: roomId,
+//       likeNum: 1,
+//     });
+//     await likeList.create({
+//       roomId: roomId,
+//       userId: userId,
+//       likeStatus: true,
+//     });
+
+//     const likeTable = await likeList.findOne({
+//       where: { roomId: roomId },
+//     });
+//     res.status(200).send({ data: likeTable.likeNum });
+//   } else {
+//     // 방이 있을 때. 2가지 (1) 다른 유저가 누를 때like +1 // (2) 같은 유저가 누를 떄like -1
+//     const checkUser = await likeList.findOne({
+//       where: { roomId: roomId, userId: userId },
+//     });
+//     if (!checkUser) {
+//       await likeList.create({
+//         roomId: roomId,
+//         userId: userId,
+//         likeStatus: true,
+//       });
+//       await likeList.increment({
+//         likeNum,
+//         where: { roomId: roomId },
+//       });
+//     } else {
+//       await likeList.update({
+//         likeStatus: false,
+//         where: { roomId: roomId },
+//       });
+//       await likeList.decrement({
+//         likeNum,
+//         where: { roomId: roomId },
+//       });
+//     }
+//     const likeTable = await likeList.findOne({
+//       where: { roomId: roomId },
+//     });
+//     res.status(200).send({ data: likeTable.likeNum });
+//   }
+// },
+
+//

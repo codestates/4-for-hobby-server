@@ -33,16 +33,14 @@ app.post("/enterroom", mainController.enterRoomController);
 app.post("/getroomusers", mainController.getRoomUsersController);
 app.post("/exitroom", mainController.exitRoomController);
 app.get("/", mainController.mainPageController);
-// app.post("/messages", mainController.messagesPostController);
-// app.get("/messages", mainController.messagesGetController);
 app.put("/mypageupdateuser", mainController.updateUserController);
-app.delete("/deleteroom:id", mainController.deleteRoomController);
+app.delete("/deleteroom/:id", mainController.deleteRoomController);
 app.use("/api/product", require("./controller/image"));
-app.put("/", mainController.likeController);
-app.get("/", mainController.postLikeNumController);
+app.get("/getlike", mainController.postLikeNumController);
+// 제대로 구현하지 못 한 like버튼
+// app.put("/", mainController.likeController);
 
 //socket.io
-
 // connection event handler
 // connection이 수립되면 event handler function의 인자로 socket인 들어온다
 io.on("connection", function (socket) {
