@@ -46,8 +46,6 @@ app.get("/getlike", mainController.postLikeNumController);
 io.on("connection", function (socket) {
   // 접속한 클라이언트의 정보가 수신되면
   socket.on("send", function (data) {
-    // console.log('Client logged-in:\n name:' + data.name + '\n userid: ' + data.userid);
-    // console.log("data:" + data.name, data.message, data.id);
     // socket에 클라이언트 정보를 저장한다
     socket.name = data.name;
     socket.message = data.message;
@@ -58,7 +56,6 @@ io.on("connection", function (socket) {
 
   // 클라이언트로부터의 메시지가 수신되면
   socket.on("send", function (data) {
-    //console.log('Message from %s: %s', data.name, data.message);
     var msg = {
       from: {
         name: data.name,
